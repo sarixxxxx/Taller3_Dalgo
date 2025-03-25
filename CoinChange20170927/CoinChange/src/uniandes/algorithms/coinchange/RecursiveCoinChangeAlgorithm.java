@@ -8,40 +8,40 @@ public class RecursiveCoinChangeAlgorithm implements CoinChangeAlgorithm{
 	public int[] calculateOptimalChange(int totalValue, int[] denominations) {
 		// TODO Auto-generated method stub
 		int n=denominations.length;
-		int[] resultado=new int[n];
-		Arrays.fill(resultado, 0);
+		int[] solActual=new int[n];
+		Arrays.fill(solActual, 0);
 		
-		int[] mejorSolucion=new int[n];
-		Arrays.fill(mejorSolucion,Integer.MAX_VALUE);
 		
-		funcionRecursiva(0,1,totalValue, denominations, resultado, mejorSolucion);
+		int[] mejorSolucion=funcionRecursiva(0,1,totalValue, denominations, solActual);
 		return mejorSolucion;
 	}
 
-	private void funcionRecursiva(int i, int m, int P, int[] D, int[] solActual,
-			int[] mejorSolucion) {
+	private int[] funcionRecursiva(int i, int m, int P, int[] D, int[] solActual) {
 		if(i>=D.length) {
-			return;
+			int[] lista=new int[D.length];
+			Arrays.fill(lista, Integer.MAX_VALUE);
+			return lista;
 		}
 		if(D[i]*m==P) {
 			solActual[i]=m;
-			
-			if(cantidadMonedas(solActual)<cantidadMonedas(mejorSolucion)) {
-				System.out.println("Habemus cosas");
-				System.arraycopy(solActual, 0, mejorSolucion, 0, D.length);
-				Arrays.fill(solActual, 0);
-			}
-			return;
+			return solActual;
 		}
 		if(D[i]*m>P) {
-			//solActual[i]=0;
-			return;
+			int[] lista=new int[D.length];
+			Arrays.fill(lista, Integer.MAX_VALUE);
+			return lista;
 		}
-		funcionRecursiva(i+1, 1,P, D, solActual, mejorSolucion);
-		solActual[i]=m;
-		funcionRecursiva(i, m+1, P-D[i]*m, D, solActual, mejorSolucion);	
-		funcionRecursiva(i+1, 1,P-D[i]*m, D, solActual, mejorSolucion);
-		solActual[i]=m-1;
+		int [] m1=funcionRecursiva(i+1,1,P, D, solActual.clone());
+		int [] m2=funcionRecursiva(i+1, 1, P-D[i]*m, D, solActual.clone());	
+		m2[i]+=m;
+		int [] m3=funcionRecursiva(i, m+1,P, D, solActual.clone());
+		if ( cantidadMonedas(m1)<=cantidadMonedas(m2) && cantidadMonedas(m1)<=cantidadMonedas(m3)) {
+			return m1;
+		}else if(cantidadMonedas(m2)<=cantidadMonedas(m3) && cantidadMonedas(m2)<=cantidadMonedas(m1)){
+			return m2;
+		}else {
+			return m3;
+		}
 		
 	}
 
@@ -49,7 +49,7 @@ public class RecursiveCoinChangeAlgorithm implements CoinChangeAlgorithm{
 		// TODO Auto-generated method stub
 		int sum = 0;
         for (int count : solActual) {
-            if (count != Integer.MAX_VALUE) sum+=Integer.MAX_VALUE;
+            if (count == Integer.MAX_VALUE) return Integer.MAX_VALUE;
             sum += count;
         }
         return sum;
